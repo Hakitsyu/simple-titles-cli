@@ -1,7 +1,10 @@
 package main
 
 import (
+	"path"
+
 	"github.com/Hakitsyu/simple-titles-cli/internal"
+	jsonstore "github.com/Hakitsyu/simple-titles-cli/internal/store/json"
 )
 
 func main() {
@@ -15,4 +18,8 @@ func main() {
 	internal.SourceStore.AddSource("OPA", "teste")
 
 	internal.TagStore.AddTag("Anime", "a", "Tag relacionada a titulos de anime")
+
+	sourceStore := jsonstore.NewJsonSourceStore(path.Join(internal.AppSourcesDirPath, "store.json"))
+
+	sourceStore.AddTitle("Naruto", []string{"a"})
 }

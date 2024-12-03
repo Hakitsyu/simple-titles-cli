@@ -1,8 +1,10 @@
-package store
+package jsonstore
 
 import (
 	"encoding/json"
 	"os"
+
+	"github.com/Hakitsyu/simple-titles-cli/internal/store"
 )
 
 type JsonAppStore struct {
@@ -34,7 +36,7 @@ func readAppJson(filePath string) *AppJson {
 	return &content
 }
 
-func (s JsonAppStore) GetDefaultSource() *SourceModel {
+func (s JsonAppStore) GetDefaultSource() *store.SourceModel {
 	sourceName := s.GetDefaultSourceName()
 	for _, source := range s.Content.Sources {
 		if source.Name == sourceName {
@@ -54,7 +56,7 @@ func (s JsonAppStore) SetDefaultSource(sourceName string) {
 }
 
 func (s JsonAppStore) AddSource(name string, path string) {
-	s.Content.Sources = append(s.Content.Sources, SourceJson{
+	s.Content.Sources = append(s.Content.Sources, AppSourceJson{
 		Name: name,
 		Path: path,
 	})
@@ -73,7 +75,7 @@ func (s JsonAppStore) RemoveSource(name string) {
 }
 
 func (s JsonAppStore) AddTag(name string, symbol string, description string) {
-	s.Content.Tags = append(s.Content.Tags, TagJson{
+	s.Content.Tags = append(s.Content.Tags, AppTagJson{
 		Name:        name,
 		Symbol:      symbol,
 		Description: description,
@@ -109,31 +111,31 @@ func (s JsonAppStore) SaveContent() {
 }
 
 type AppJson struct {
-	DefaultSource string       `json:"defaultSource"`
-	Sources       []SourceJson `json:"sources"`
-	Tags          []TagJson    `json:"tags"`
+	DefaultSource string          `json:"defaultSource"`
+	Sources       []AppSourceJson `json:"sources"`
+	Tags          []AppTagJson    `json:"tags"`
 }
 
-type SourceJson struct {
+type AppSourceJson struct {
 	Name string `json:"name"`
 	Path string `json:"path"`
 }
 
-func (s SourceJson) ToSourceModel() *SourceModel {
-	return &SourceModel{
+func (s AppSourceJson) ToSourceModel() *store.SourceModel {
+	return &store.SourceModel{
 		Name: s.Name,
 		Path: s.Path,
 	}
 }
 
-type TagJson struct {
+type AppTagJson struct {
 	Name        string `json:"name"`
 	Symbol      string `json:"symbol"`
 	Description string `json:"description"`
 }
 
-func (t TagJson) ToTagModel() *TagModel {
-	return &TagModel{
+func (t AppTagJson) ToTagModel() *store.TagModel {
+	return &store.TagModel{
 		Name:        t.Name,
 		Symbol:      t.Symbol,
 		Description: t.Description,

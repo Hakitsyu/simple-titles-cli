@@ -1,5 +1,7 @@
 package store
 
+import "github.com/google/uuid"
+
 type AppStore interface {
 	GetDefaultSource() *SourceModel
 	GetDefaultSourceName() string
@@ -13,4 +15,9 @@ type SourceStore interface {
 
 type TagStore interface {
 	AddTag(name string, symbol string, description string)
+}
+
+type TitleStore interface {
+	AddTitle(title string, tags []string) uuid.UUID
+	RemoveTitle(id uuid.UUID)
 }

@@ -10,3 +10,8 @@ type TagModel struct {
 	Symbol      string
 	Description string
 }
+
+type TitleModel struct {
+	Title string
+	Tags  []string
+}

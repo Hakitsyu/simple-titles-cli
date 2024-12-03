@@ -2,6 +2,7 @@ package internal
 
 import (
 	"github.com/Hakitsyu/simple-titles-cli/internal/store"
+	jsonstore "github.com/Hakitsyu/simple-titles-cli/internal/store/json"
 )
 
 const AppName string = "Simple Titles CLI"
@@ -15,7 +16,7 @@ var (
 func init() {
 	LoadPaths()
 
-	currentStore := store.NewJsonAppStore(AppConfigPath)
+	currentStore := jsonstore.NewJsonAppStore(AppConfigPath)
 
 	Store = currentStore
 	SourceStore = currentStore
