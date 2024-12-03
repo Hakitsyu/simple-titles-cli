@@ -83,7 +83,6 @@ var titleAddCommand = &cobra.Command{
 	},
 }
 
-// Desenvolva o comando de remover titles, recebendo o ID do title
 var titleRemoveCommand = &cobra.Command{
 	Use:   "remove",
 	Short: "Remove a title",
