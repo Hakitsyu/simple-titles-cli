@@ -16,11 +16,11 @@ func GetEmbeddedStoreAsString() (string, error) {
 	return string(data), nil
 }
 
-//go:embed default-source.json
+//go:embed sources/default.json
 var defaultSourceFile embed.FS
 
 func GetEmbeddedDefaultSourceAsString() (string, error) {
-	data, err := defaultSourceFile.ReadFile("default-source.json")
+	data, err := defaultSourceFile.ReadFile("sources/default.json")
 	if err != nil {
 		return "", err
 	}
