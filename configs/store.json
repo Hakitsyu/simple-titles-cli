@@ -1,0 +1,9 @@
+{
+    "defaultSource": "default",
+    "sources": [
+        {
+            "name": "default",
+            "path": "%APPDIR%\\sources\\default.json"
+        }
+    ]
+}
