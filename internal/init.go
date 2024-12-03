@@ -10,7 +10,7 @@ import (
 	"github.com/Hakitsyu/simple-titles-cli/configs"
 )
 
-const defaultStoreFileName = "store.json"
+const defaultStoreFileName = "default.json"
 
 func CreateInitialResources() {
 	if existsAppFolder() {

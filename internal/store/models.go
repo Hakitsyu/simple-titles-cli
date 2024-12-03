@@ -1,8 +1,11 @@
 package store
 
+import "github.com/google/uuid"
+
 type SourceModel struct {
-	Name string
-	Path string
+	Name        string
+	Path        string
+	Description string
 }
 
 type TagModel struct {
@@ -12,6 +15,7 @@ type TagModel struct {
 }
 
 type TitleModel struct {
-	Title string
-	Tags  []string
+	Id   uuid.UUID
+	Name string
+	Tags []string
 }

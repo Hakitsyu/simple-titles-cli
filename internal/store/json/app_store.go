@@ -24,16 +24,35 @@ func NewJsonAppStore(filePath string) *JsonAppStore {
 func readAppJson(filePath string) *AppJson {
 	data, err := os.ReadFile(filePath)
 	if err != nil {
-		return nil
+		panic(err)
 	}
 
 	var content AppJson
 	err = json.Unmarshal(data, &content)
 	if err != nil {
-		return nil
+		panic(err)
 	}
 
 	return &content
+}
+
+func (s JsonAppStore) GetSources() []store.SourceModel {
+	sources := make([]store.SourceModel, len(s.Content.Sources))
+
+	for i, source := range s.Content.Sources {
+		sources[i] = *source.ToSourceModel()
+	}
+
+	return sources
+}
+
+func (s JsonAppStore) GetSource(sourceName string) *store.SourceModel {
+	for _, source := range s.Content.Sources {
+		if source.Name == sourceName {
+			return source.ToSourceModel()
+		}
+	}
+	return nil
 }
 
 func (s JsonAppStore) GetDefaultSource() *store.SourceModel {
@@ -50,15 +69,26 @@ func (s JsonAppStore) GetDefaultSourceName() string {
 	return s.Content.DefaultSource
 }
 
+func (s JsonAppStore) ExistsSource(sourceName string) bool {
+	for _, source := range s.Content.Sources {
+		if source.Name == sourceName {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (s JsonAppStore) SetDefaultSource(sourceName string) {
 	s.Content.DefaultSource = sourceName
 	s.SaveContent()
 }
 
-func (s JsonAppStore) AddSource(name string, path string) {
+func (s JsonAppStore) AddSource(name string, path string, description string) {
 	s.Content.Sources = append(s.Content.Sources, AppSourceJson{
-		Name: name,
-		Path: path,
+		Name:        name,
+		Path:        path,
+		Description: description,
 	})
 
 	s.SaveContent()
@@ -117,14 +147,16 @@ type AppJson struct {
 }
 
 type AppSourceJson struct {
-	Name string `json:"name"`
-	Path string `json:"path"`
+	Name        string `json:"name"`
+	Path        string `json:"path"`
+	Description string `json:"description"`
 }
 
 func (s AppSourceJson) ToSourceModel() *store.SourceModel {
 	return &store.SourceModel{
-		Name: s.Name,
-		Path: s.Path,
+		Name:        s.Name,
+		Path:        s.Path,
+		Description: s.Description,
 	}
 }
 

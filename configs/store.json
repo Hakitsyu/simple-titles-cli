@@ -3,7 +3,8 @@
     "sources": [
         {
             "name": "default",
-            "path": "%APPDIR%\\sources\\default.json"
+            "path": "%APPDIR%\\sources\\default.json",
+            "description": "The default source"
         }
     ]
 }

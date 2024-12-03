@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 
+	"github.com/Hakitsyu/simple-titles-cli/internal/store"
 	"github.com/google/uuid"
 )
 
@@ -60,6 +61,16 @@ func (s JsonSourceStore) RemoveTitle(id uuid.UUID) {
 	}
 }
 
+func (s JsonSourceStore) GetTitles() []store.TitleModel {
+	titles := make([]store.TitleModel, len(s.Content.Titles))
+
+	for i, title := range s.Content.Titles {
+		titles[i] = *title.ToTitleModel()
+	}
+
+	return titles
+}
+
 func (s JsonSourceStore) ReloadContent() {
 	s.Content = readSourceJson(s.FilePath)
 }
@@ -81,7 +92,20 @@ type SourceJson struct {
 }
 
 type SourceTitleJson struct {
-	Id   string   `json:"guid"`
+	Id   string   `json:"id"`
 	Name string   `json:"name"`
 	Tags []string `json:"tags"`
+}
+
+func (t SourceTitleJson) ToTitleModel() *store.TitleModel {
+	id, err := uuid.Parse(t.Id)
+	if err != nil {
+		panic(err)
+	}
+
+	return &store.TitleModel{
+		Id:   id,
+		Name: t.Name,
+		Tags: t.Tags,
+	}
 }

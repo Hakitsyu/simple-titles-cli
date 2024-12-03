@@ -15,6 +15,7 @@ var (
 
 func init() {
 	LoadPaths()
+	CreateInitialResources()
 
 	currentStore := jsonstore.NewJsonAppStore(AppConfigPath)
 

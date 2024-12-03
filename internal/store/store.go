@@ -9,8 +9,11 @@ type AppStore interface {
 }
 
 type SourceStore interface {
-	AddSource(name string, path string)
+	AddSource(name string, path string, description string)
 	RemoveSource(name string)
+	GetSources() []SourceModel
+	GetSource(sourceName string) *SourceModel
+	ExistsSource(sourceName string) bool
 }
 
 type TagStore interface {
@@ -20,4 +23,5 @@ type TagStore interface {
 type TitleStore interface {
 	AddTitle(title string, tags []string) uuid.UUID
 	RemoveTitle(id uuid.UUID)
+	GetTitles() []TitleModel
 }
