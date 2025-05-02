@@ -61,6 +61,16 @@ func (s JsonSourceStore) RemoveTitle(id uuid.UUID) {
 	}
 }
 
+func (s JsonSourceStore) UpdateTitleTags(id uuid.UUID, tags []string) {
+	for i, title := range s.Content.Titles {
+		if title.Id == id.String() {
+			s.Content.Titles[i].Tags = tags
+			s.SaveContent()
+			break
+		}
+	}
+}
+
 func (s JsonSourceStore) GetTitles() []store.TitleModel {
 	titles := make([]store.TitleModel, len(s.Content.Titles))
 
@@ -69,6 +79,16 @@ func (s JsonSourceStore) GetTitles() []store.TitleModel {
 	}
 
 	return titles
+}
+
+func (s JsonSourceStore) GetTitleById(id uuid.UUID) *store.TitleModel {
+	for _, title := range s.Content.Titles {
+		if title.Id == id.String() {
+			return title.ToTitleModel()
+		}
+	}
+
+	return nil
 }
 
 func (s JsonSourceStore) ReloadContent() {

@@ -24,4 +24,6 @@ type TitleStore interface {
 	AddTitle(title string, tags []string) uuid.UUID
 	RemoveTitle(id uuid.UUID)
 	GetTitles() []TitleModel
+	UpdateTitleTags(id uuid.UUID, tags []string)
+	GetTitleById(id uuid.UUID) *TitleModel
 }

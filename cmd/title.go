@@ -19,8 +19,13 @@ func init() {
 	titleCommand.AddCommand(titleAddCommand)
 	titleCommand.AddCommand(titleRemoveCommand)
 	titleCommand.AddCommand(titleImportCommand)
-	ConfigureSourceFlag(titleCommand, "Source used to handle your titles")
 
+	titleTagCommand.AddCommand(titleTagAddCommand)
+	titleTagCommand.AddCommand(titleTagRemoveCommand)
+	titleTagCommand.AddCommand(titleTagListCommand)
+	titleCommand.AddCommand(titleTagCommand)
+
+	ConfigureSourceFlag(titleCommand, "Source used to handle your titles")
 	rootCommand.AddCommand(titleCommand)
 }
 
@@ -219,6 +224,99 @@ var titleImportCommand = &cobra.Command{
 			fmt.Printf(`
 	%d Titles imported successfully.
 			`, titlesQty)
+		}
+	},
+}
+
+var titleTagCommand = &cobra.Command{
+	Use:   "tag",
+	Short: "Manage tags for titles",
+}
+
+var titleTagAddCommand = &cobra.Command{
+	Use:   "add [id] [tag]",
+	Short: "Add a tag to a title",
+	Args:  cobra.ExactArgs(2),
+	Run: func(cmd *cobra.Command, args []string) {
+		id, err := uuid.Parse(args[0])
+		if err != nil {
+			fmt.Println("Invalid title ID:", err)
+			return
+		}
+
+		tag := args[1]
+		source := GetCurrentSource()
+		store := internal.NewTitleStoreBySourceName(source)
+
+		title := store.GetTitleById(id)
+		if title == nil {
+			fmt.Println("Title not found")
+			return
+		}
+
+		tags := append(title.Tags, tag)
+		store.UpdateTitleTags(id, tags)
+
+		fmt.Printf("Tag '%s' added successfully to title\n", tag)
+	},
+}
+
+var titleTagRemoveCommand = &cobra.Command{
+	Use:   "remove [id] [tag]",
+	Short: "Remove a tag from a title",
+	Args:  cobra.ExactArgs(2),
+	Run: func(cmd *cobra.Command, args []string) {
+		id, err := uuid.Parse(args[0])
+		if err != nil {
+			fmt.Println("Invalid title ID:", err)
+			return
+		}
+
+		tagToRemove := args[1]
+		source := GetCurrentSource()
+		store := internal.NewTitleStoreBySourceName(source)
+
+		title := store.GetTitleById(id)
+		if title == nil {
+			fmt.Println("Title not found")
+			return
+		}
+
+		tags := make([]string, 0)
+		for _, tag := range title.Tags {
+			if tag != tagToRemove {
+				tags = append(tags, tag)
+			}
+		}
+
+		store.UpdateTitleTags(id, tags)
+		fmt.Printf("Tag '%s' removed successfully from title\n", tagToRemove)
+	},
+}
+
+var titleTagListCommand = &cobra.Command{
+	Use:   "list [id]",
+	Short: "List all tags for a title",
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		id, err := uuid.Parse(args[0])
+		if err != nil {
+			fmt.Println("Invalid title ID:", err)
+			return
+		}
+
+		source := GetCurrentSource()
+		store := internal.NewTitleStoreBySourceName(source)
+
+		title := store.GetTitleById(id)
+		if title == nil {
+			fmt.Println("Title not found")
+			return
+		}
+
+		fmt.Println("Tags:")
+		for _, tag := range title.Tags {
+			fmt.Printf("- %s\n", tag)
 		}
 	},
 }
