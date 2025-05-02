@@ -2,16 +2,19 @@ package cmd
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
 
 	"github.com/Hakitsyu/simple-titles-cli/internal"
 	"github.com/google/uuid"
+	"github.com/jmespath/go-jmespath"
 	"github.com/spf13/cobra"
 )
 
 func init() {
+	titleCommand.AddCommand(titleSearchCommand)
 	titleCommand.AddCommand(titleListCommand)
 	titleCommand.AddCommand(titleAddCommand)
 	titleCommand.AddCommand(titleRemoveCommand)
@@ -52,10 +55,69 @@ var titleListCommand = &cobra.Command{
 				tags = " [" + strings.Join(title.Tags, ", ") + "]"
 			}
 
-			fmt.Printf("	- %s%s (%s)\n", title.Name, tags, title.Id.String())
+			titleName := strings.TrimSpace(title.Name)
+			fmt.Printf("	- %s%s (%s)\n", titleName, tags, title.Id.String())
 		}
 
 		fmt.Println("")
+	},
+}
+
+var titleSearchCommand = &cobra.Command{
+	Use:   "search [query]",
+	Short: "Search titles using JMESPath expressions",
+	Long: `Search titles using JMESPath query expressions. Examples:
+
+	# Search by name containing "test"
+	title search "[?contains(Name, 'test')]"
+
+	# Search by specific tag
+	title search "[?contains(Tags, 'important')]" 
+
+	# Search by ID
+	title search "[?Id=='123e4567-e89b-12d3-a456-426614174000']"
+
+	# Combine conditions
+	title search "[?contains(Name,'test') && contains(Tags, 'important')]"`,
+	Args: cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		source := GetCurrentSource()
+
+		store := internal.NewTitleStoreBySourceName(source)
+
+		titles := store.GetTitles()
+		titlesJson := make([]map[string]interface{}, len(titles))
+		for i, title := range titles {
+			titlesJson[i] = map[string]interface{}{
+				"Id":   title.Id.String(),
+				"Name": title.Name,
+				"Tags": title.Tags,
+			}
+		}
+
+		jsonData, err := json.Marshal(titlesJson)
+		if err != nil {
+			fmt.Printf("Error converting data: %v\n", err)
+			return
+		}
+
+		var data interface{}
+		err = json.Unmarshal(jsonData, &data)
+		if err != nil {
+			fmt.Printf("Error parsing JSON: %v\n", err)
+			return
+		}
+
+		query := args[0]
+
+		result, err := jmespath.Search(query, data)
+		if err != nil {
+			fmt.Printf("Error executing query: %v\n", err)
+			return
+		}
+
+		resultJson, _ := json.MarshalIndent(result, "", "    ")
+		fmt.Println(string(resultJson))
 	},
 }
 
